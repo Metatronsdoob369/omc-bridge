@@ -78,14 +78,9 @@ jobs:
           [ "$STATUS" = "400" ] && echo "PASS /escrow bad-base64 → 400" || (echo "FAIL /escrow bad-base64 got $STATUS" && kill $SERVER_PID && exit 1)
 
           # /telemetry — well-formed record must return 200
-          CODE=$(python3 -c "import base64; print(base64.b64encode(b\"local x=1\").decode())")
-          SHA=$(echo -n "local x=1" | sha256sum | cut -d' ' -f1)
-          MANIFEST_JSON="{\"schema_version\":\"1.0\",\"pack_id\":\"smoke\",\"pack_version\":\"1.0.0\",\"pipeline_id\":\"11111111-1111-4111-8111-111111111111\",\"created_at\":\"2026-01-01T00:00:00Z\",\"files\":[{\"path\":\"x.luau\",\"type\":\"luau_module\",\"sha256\":\"$SHA\"}]}"
-          MANIFEST_HASH=$(echo -n "$MANIFEST_JSON" | sha256sum | cut -d' ' -f1)
-          SPECTRAL="{\"heat\":0.9,\"shatter\":0.1,\"shatterMap\":[0.1,0.11,0.12],\"nearestCanonicalId\":\"CANON:bootstrap\",\"nearestCanonicalScore\":0.95,\"room\":\"sandbox://smoke\",\"embeddingModel\":\"mxbai-embed-large\",\"vectorDim\":3072,\"tFrame\":\"t_start\"}"
           ESCROW=$(curl -s -X POST http://127.0.0.1:19200/escrow \
             -H "Content-Type: application/json" \
-            -d "{\"schema_version\":\"1.0\",\"pipeline_id\":\"11111111-1111-4111-8111-111111111111\",\"manifest_hash\":\"$MANIFEST_HASH\",\"manifest\":$MANIFEST_JSON,\"ttl_seconds\":60,\"modules\":[{\"module_id\":\"m1\",\"name\":\"x.luau\",\"content\":\"$CODE\",\"sha256\":\"$SHA\",\"capability_tags\":[\"capability:client.install\"],\"spectral\":$SPECTRAL}],\"capability_tags\":[\"capability:client.install\"],\"pack_id\":\"smoke\",\"pack_version\":\"1.0.0\"}")
+            -d @test/fixtures/good-escrow.json)
           SESSION=$(echo "$ESCROW" | python3 -c "import sys,json; print(json.load(sys.stdin)['session_id'])" 2>/dev/null || true)
           [ -z "$SESSION" ] && echo "FAIL /escrow did not return session_id — response: $ESCROW" && kill $SERVER_PID && exit 1
           echo "PASS /escrow good payload → session $SESSION"

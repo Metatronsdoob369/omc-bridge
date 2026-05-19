@@ -16,6 +16,31 @@ cp .env.example .env
 # edit .env as needed — defaults work for local development
 ```
 
+## Quick demo
+
+```bash
+# 1. Start
+npm start
+
+# 2. Health check
+curl http://localhost:3099/health
+# {"status":"ok"}
+
+# 3. Submit a code bundle — governance gate fires, session opened
+curl -X POST http://localhost:3099/escrow \
+  -H "Content-Type: application/json" \
+  -d @test/fixtures/good-escrow.json
+# {"session_id":"...","token":"...","expires_at":"...","created_at":"..."}
+
+# 4. Retrieve the modules (runtime side)
+curl "http://localhost:3099/escrow/<session_id>/modules?token=<token>"
+
+# 5. Inspect the audit trail
+cat bridge.log
+```
+
+---
+
 ## Boot
 
 ```bash

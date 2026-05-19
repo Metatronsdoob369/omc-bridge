@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "pipeline_id": "11111111-1111-4111-8111-111111111111",
+  "manifest_hash": "9dba77bc2131da359a33bee5f3a1d237800c6995d4fd207c04eb11f47890559c",
+  "manifest": {
+    "schema_version": "1.0",
+    "pack_id": "roblox-game-automator",
+    "pack_version": "1.0.0",
+    "pipeline_id": "11111111-1111-4111-8111-111111111111",
+    "created_at": "2026-01-01T00:00:00Z",
+    "files": [
+      {
+        "path": "generated/StructureGenerator.luau",
+        "type": "luau_module",
+        "sha256": "fb313d894d88594373c3b2f292fe016807b6e015bf98c0752c54068a602153fc"
+      }
+    ]
+  },
+  "ttl_seconds": 120,
+  "modules": [
+    {
+      "module_id": "architect-01",
+      "name": "StructureGenerator.luau",
+      "content": "bG9jYWwgeD0x",
+      "sha256": "fb313d894d88594373c3b2f292fe016807b6e015bf98c0752c54068a602153fc",
+      "capability_tags": ["capability:client.install"],
+      "spectral": {
+        "heat": 0.9,
+        "shatter": 0.1,
+        "shatterMap": [0.1, 0.11, 0.12],
+        "nearestCanonicalId": "CANON:bootstrap",
+        "nearestCanonicalScore": 0.95,
+        "room": "sandbox://demo",
+        "embeddingModel": "mxbai-embed-large",
+        "vectorDim": 3072,
+        "tFrame": "t_start"
+      }
+    }
+  ],
+  "capability_tags": ["capability:client.install"],
+  "pack_id": "roblox-game-automator",
+  "pack_version": "1.0.0",
+  "metadata": {
+    "scenario": "demo",
+    "run_mode": "headless"
+  }
+}
