@@ -6,7 +6,7 @@ Run this for every release. Check each item before pushing the tag.
 
 ## Pre-release
 
-- [ ] **Fresh clone verify** — clone into a temp dir, `npm install`, `npm run release`. Must pass with zero errors.
+- [ ] **Fresh clone verify** — automated by the `fresh-install` CI job (no cache, `npm install`, `npm run release`). Confirm it is green before tagging. To run locally:
   ```bash
   tmp=$(mktemp -d) && git clone https://github.com/Metatronsdoob369/omc-bridge "$tmp/omc-bridge" \
     && cd "$tmp/omc-bridge" && npm install && npm run release
@@ -49,7 +49,7 @@ These failures have happened in real releases. They are preflight items because 
 |---------|-------------|-------------------|-----|
 | v1.0.1 | `zod` missing from `package.json` | Monorepo's hoisted `node_modules` covered it locally — typecheck passed in-tree, failed on fresh clone | Added `zod` as an explicit dependency. Fresh-clone step in pre-release is the only reliable catch for this class of failure. |
 
-**The rule:** If a package is imported in `src/`, it must be in `dependencies` or `devDependencies`. Hoisted deps from a parent workspace are invisible to consumers. The fresh-clone step is non-negotiable — it is the only environment that behaves like a real consumer.
+**The rule:** If a package is imported in `src/`, it must be in `dependencies` or `devDependencies`. Hoisted deps from a parent workspace are invisible to consumers. The `fresh-install` CI job enforces this automatically — it runs `npm install` with no cache on every push, which is the only environment that behaves like a real consumer.
 
 ---
 

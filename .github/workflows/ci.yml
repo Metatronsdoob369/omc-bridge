@@ -25,9 +25,25 @@ jobs:
       - name: Verify
         run: npm run verify
 
+  fresh-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # No cache — simulates a clean consumer install
+
+      - name: Install from package.json (no lockfile shortcut)
+        run: npm install
+
+      - name: Release gate on clean install
+        run: npm run release
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: gate
+    needs: [gate, fresh-install]
     runs-on: ubuntu-latest
     permissions:
       contents: write
