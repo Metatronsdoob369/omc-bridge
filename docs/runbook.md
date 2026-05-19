@@ -110,4 +110,39 @@ Every significant event is appended to `OMC_AUDIT_LOG` as a JSONL record. Key ev
 
 ## Versioning
 
-`MAJOR.MINOR.PATCH` — semver. Tag `vX.Y.Z` on `main` to trigger a GitHub Release. The release job runs `typecheck + verify + build` before publishing.
+`MAJOR.MINOR.PATCH` — semver. Tag `vX.Y.Z` on `main` to trigger a GitHub Release.
+
+---
+
+## Release process (frozen as of v1.0.1)
+
+This process is stable. Do not change it unless a real release failure forces a revision.
+
+**CI pipeline — three mandatory jobs on every push:**
+
+| Job | What it does |
+|-----|-------------|
+| `gate` | `npm ci` (cached) → typecheck → verify |
+| `fresh-install` | no cache, `npm install` → `npm run release` (typecheck + verify + build) |
+| `smoke` | boots the bridge, tests `/health`, `/escrow` bad-base64 → 400, `/escrow` good → session, `/telemetry` → 200 |
+
+**Release job — tag-triggered, requires all three above:**
+
+1. `npm ci` + `npm run build`
+2. Artifact verification: `dist/index.js`, `dist/index.d.ts`, `schemas/*.json` must exist
+3. GitHub Release created with tag name and confirmation message
+
+**To cut a release:**
+
+```bash
+# 1. Confirm all CI jobs green on main
+# 2. Bump version in package.json
+git commit -am "chore: bump version to vX.Y.Z"
+git push
+
+# 3. Tag and push — release job runs automatically
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+Full pre-tag checklist: `docs/release-checklist.md`
