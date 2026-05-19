@@ -281,6 +281,12 @@ async function run(): Promise<void> {
     bridge = startBridge(port, auditLogPath);
     await waitForHealth(baseUrl);
 
+    const latestEmpty = await requestJson(baseUrl, '/escrow/latest');
+    assert.equal(latestEmpty.status, 200);
+    assert.equal(latestEmpty.json.ready, false);
+    assert.equal(latestEmpty.json.session_id, null);
+    assert.equal(latestEmpty.json.token, null);
+
     const badBase64Payload = buildEscrowPayload({
       code: "print('bad base64 check')",
       content: '%%%%',
@@ -321,6 +327,12 @@ async function run(): Promise<void> {
     const token = String(escrowRes.json.token ?? '');
     assert.equal(sessionId.length > 0, true);
     assert.equal(token.length > 0, true);
+
+    const latestReady = await requestJson(baseUrl, '/escrow/latest');
+    assert.equal(latestReady.status, 200);
+    assert.equal(latestReady.json.ready, true);
+    assert.equal(latestReady.json.session_id, sessionId);
+    assert.equal(latestReady.json.token, token);
 
     const modulesRes = await requestJson(
       baseUrl,
@@ -380,6 +392,11 @@ async function run(): Promise<void> {
     });
     assert.equal(consumeRes.status, 200);
     assert.equal(consumeRes.json.consumed, true);
+
+    const latestAfterConsume = await requestJson(baseUrl, '/escrow/latest');
+    assert.equal(latestAfterConsume.status, 200);
+    assert.equal(latestAfterConsume.json.ready, false);
+    assert.equal(latestAfterConsume.json.session_id, null);
 
     await new Promise((resolve) => setTimeout(resolve, 150));
     const auditRecords = parseJsonLines(auditLogPath);
