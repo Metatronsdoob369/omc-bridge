@@ -1,6 +1,6 @@
 {
   "name": "omc-bridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OMC Bridge — sovereign escrow, governance gate, and telemetry server for the Open Model Contracts pipeline",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,8 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "express": "^4.21.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
