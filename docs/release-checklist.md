@@ -41,6 +41,18 @@ Run this for every release. Check each item before pushing the tag.
 
 ---
 
+## Lessons learned
+
+These failures have happened in real releases. They are preflight items because of that, not despite it.
+
+| Version | What failed | Why it was silent | Fix |
+|---------|-------------|-------------------|-----|
+| v1.0.1 | `zod` missing from `package.json` | Monorepo's hoisted `node_modules` covered it locally — typecheck passed in-tree, failed on fresh clone | Added `zod` as an explicit dependency. Fresh-clone step in pre-release is the only reliable catch for this class of failure. |
+
+**The rule:** If a package is imported in `src/`, it must be in `dependencies` or `devDependencies`. Hoisted deps from a parent workspace are invisible to consumers. The fresh-clone step is non-negotiable — it is the only environment that behaves like a real consumer.
+
+---
+
 ## Release log
 
 | Version | Date | Commit SHA | Notes |
