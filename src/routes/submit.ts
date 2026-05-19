@@ -15,7 +15,9 @@ const router = Router();
 router.use(requireApiKey);
 router.use(verifyHmac);
 
-const REPO_ROOT = resolve(__dirname, '../../../../');
+const REPO_ROOT = resolve(__dirname, '../../');
+const REPO_GITHUB_URL =
+  process.env.OMC_BRIDGE_REPO_URL ?? 'https://github.com/Metatronsdoob369/omc-bridge';
 const ALLOWED_PREFIXES = ['src/server/', 'src/client/', 'generated/'];
 
 function isSafeTarget(filePath: string): boolean {
@@ -90,7 +92,7 @@ router.post('/', async (req: Request, res: Response) => {
       ok: true,
       branch,
       files_written: files.length,
-      pr_url: `https://github.com/Metatronsdoob369/open-model-contracts/compare/${branch}?expand=1`,
+      pr_url: `${REPO_GITHUB_URL}/compare/${branch}?expand=1`,
       message: `Submitted. CI is running. PR auto-opens — check the link above.`,
     });
   } catch (err) {
