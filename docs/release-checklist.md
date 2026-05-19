@@ -46,4 +46,4 @@ Run this for every release. Check each item before pushing the tag.
 | Version | Date | Commit SHA | Notes |
 |---------|------|-----------|-------|
 | v1.0.0 | 2026-05-19 | 36cd61b | Initial standalone extraction from open-model-contracts monorepo |
-| v1.0.1 | 2026-05-19 | — | Add zod dep, release checklist, submit.ts monorepo fixes |
+| v1.0.1 | 2026-05-19 | 3402d9f | Add zod dep, release checklist, submit.ts monorepo fixes |
