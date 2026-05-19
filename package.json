@@ -1,0 +1,35 @@
+{
+  "name": "omc-bridge",
+  "version": "1.0.0",
+  "description": "OMC Bridge — sovereign escrow, governance gate, and telemetry server for the Open Model Contracts pipeline",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "verify": "tsx src/verification/bridge-verification.ts",
+    "release": "npm run typecheck && npm run verify && npm run build"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "express": "^4.21.2",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.19.33",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Metatronsdoob369/omc-bridge.git"
+  }
+}

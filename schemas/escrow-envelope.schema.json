@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://open-model-contracts.dev/schemas/escrow-envelope.schema.json",
+  "title": "Escrow Envelope",
+  "description": "Phase 2 (Escrow) payload. Submitted by the agent to the Bridge server to create an armed escrow session. Contains the manifest hash, module bundle, session metadata, and capability tags.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "pipeline_id",
+    "manifest_hash",
+    "manifest",
+    "ttl_seconds",
+    "modules",
+    "capability_tags"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Version of this envelope schema.",
+      "pattern": "^\\d+\\.\\d+$",
+      "example": "1.0"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Unique escrow session identifier (UUID v4). Server-assigned on creation — omit when POSTing to /escrow.",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "token": {
+      "type": "string",
+      "description": "One-time pull token (nonce). Server-generated on session creation. Omit when POSTing to /escrow.",
+      "minLength": 32
+    },
+    "pipeline_id": {
+      "type": "string",
+      "description": "Pipeline run id, must match the manifest's pipeline_id.",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "manifest_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the serialised omc.manifest.json, used by the Bridge to verify integrity.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ttl_seconds": {
+      "type": "integer",
+      "description": "Session time-to-live in seconds. After this duration the session is expired and unreachable.",
+      "minimum": 60,
+      "maximum": 86400,
+      "example": 3600
+    },
+    "expires_at": {
+      "type": "string",
+      "description": "ISO 8601 expiry timestamp, computed by the Bridge on creation.",
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the session was created.",
+      "format": "date-time"
+    },
+    "modules": {
+      "type": "array",
+      "description": "List of Luau modules to escrow.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/ModuleEntry"
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "description": "The Phase 1 omc.manifest.json object, embedded for traceability and cross-validation.",
+      "required": ["pipeline_id", "pack_id", "pack_version", "created_at", "files"],
+      "additionalProperties": true
+    },
+    "capability_tags": {
+      "type": "array",
+      "description": "OMC capability tags that describe what this bundle requires from the client.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^capability:[a-z_\\.]+$"
+      },
+      "example": ["capability:client.install", "capability:platform.apply_changes"]
+    },
+    "pack_id": {
+      "type": "string",
+      "description": "Source pack identifier.",
+      "example": "roblox-game-automator"
+    },
+    "pack_version": {
+      "type": "string",
+      "description": "Semver version of the pack.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "consumed": {
+      "type": "boolean",
+      "description": "Whether this session has been consumed (modules pulled). Set by the Bridge server.",
+      "default": false
+    },
+    "consumed_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the session was consumed.",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary key-value pairs for pack-specific metadata.",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean"]
+      }
+    }
+  },
+  "$defs": {
+    "ModuleEntry": {
+      "type": "object",
+      "required": ["module_id", "name", "content", "sha256", "capability_tags"],
+      "additionalProperties": false,
+      "properties": {
+        "module_id": {
+          "type": "string",
+          "description": "Unique identifier for this module, matching the specialist id.",
+          "example": "architect-01"
+        },
+        "name": {
+          "type": "string",
+          "description": "Luau file name (without path).",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*\\.luau$",
+          "example": "StructureGenerator.luau"
+        },
+        "content": {
+          "type": "string",
+          "description": "Base64-encoded Luau source content.",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "description": "SHA-256 hash of the decoded content (must match manifest entry).",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "capability_tags": {
+          "type": "array",
+          "description": "Capabilities this specific module requires.",
+          "items": {
+            "type": "string",
+            "pattern": "^capability:[a-z_\\.]+$"
+          }
+        },
+        "target_path": {
+          "type": "string",
+          "description": "Roblox hierarchy target path for Studio install.",
+          "example": "ReplicatedStorage.OMCModules.v1_0_0.StructureGenerator"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this module."
+        },
+        "spectral": {
+          "$ref": "#/$defs/ModuleSpectralSignals"
+        }
+      }
+    },
+    "ModuleSpectralSignals": {
+      "type": "object",
+      "required": [
+        "heat",
+        "shatter",
+        "shatterMap",
+        "nearestCanonicalId",
+        "nearestCanonicalScore",
+        "room",
+        "embeddingModel",
+        "vectorDim",
+        "tFrame"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "heat": {
+          "type": "number"
+        },
+        "shatter": {
+          "type": "number"
+        },
+        "shatterMap": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "nearestCanonicalId": {
+          "type": ["string", "null"]
+        },
+        "nearestCanonicalScore": {
+          "type": ["number", "null"]
+        },
+        "room": {
+          "type": "string"
+        },
+        "embeddingModel": {
+          "type": "string"
+        },
+        "vectorDim": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tFrame": {
+          "type": "string",
+          "enum": ["t_start", "t_minus_1", "t"]
+        }
+      }
+    }
+  }
+}

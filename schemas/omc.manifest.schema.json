@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://open-model-contracts.dev/schemas/omc.manifest.schema.json",
+  "title": "OMC Manifest",
+  "description": "Phase 1 (Intelligence) output artifact. Describes every file produced by the specialist agent, including hashes, the pack version, and the pipeline run id.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "pack_id",
+    "pack_version",
+    "pipeline_id",
+    "created_at",
+    "files"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Version of this manifest schema.",
+      "pattern": "^\\d+\\.\\d+$",
+      "example": "1.0"
+    },
+    "pack_id": {
+      "type": "string",
+      "description": "Identifier of the OMC pack that produced this manifest.",
+      "example": "roblox-game-automator"
+    },
+    "pack_version": {
+      "type": "string",
+      "description": "Semver version of the pack.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "example": "1.0.0"
+    },
+    "pipeline_id": {
+      "type": "string",
+      "description": "Unique identifier for this pipeline run (UUID v4).",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "example": "a1b2c3d4-e5f6-4789-abcd-ef1234567890"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the manifest was produced.",
+      "format": "date-time",
+      "example": "2026-04-04T14:00:00.000Z"
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "Optional identifier of the agent that produced this manifest.",
+      "example": "claude-3-7-sonnet"
+    },
+    "constitution_version": {
+      "type": "string",
+      "description": "Version of the OMC constitution used during generation.",
+      "example": "1.0"
+    },
+    "files": {
+      "type": "array",
+      "description": "List of files produced during Phase 1.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/FileEntry"
+      }
+    },
+    "specialists": {
+      "type": "array",
+      "description": "Roster of specialists (agents) that contributed to this manifest.",
+      "items": {
+        "$ref": "#/$defs/SpecialistEntry"
+      }
+    },
+    "capabilities_used": {
+      "type": "array",
+      "description": "List of OMC capability IDs exercised during Phase 1.",
+      "items": {
+        "type": "string",
+        "pattern": "^capability:[a-z_\\.]+$"
+      },
+      "example": ["capability:file.write", "capability:schema.validation"]
+    },
+    "approvals_required": {
+      "type": "array",
+      "description": "List of approvals that must be obtained before Phase 2 may proceed.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary key-value pairs for pack-specific metadata.",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean"]
+      }
+    }
+  },
+  "$defs": {
+    "FileEntry": {
+      "type": "object",
+      "required": ["path", "type", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path from project root to the written file.",
+          "example": "generated/roblox-game-automator/modules/StructureGenerator.luau"
+        },
+        "type": {
+          "type": "string",
+          "description": "File category.",
+          "enum": ["luau_module", "json_config", "yaml_policy", "markdown_doc", "other"]
+        },
+        "sha256": {
+          "type": "string",
+          "description": "Hex-encoded SHA-256 hash of the file contents.",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "description": "File size in bytes.",
+          "minimum": 0
+        },
+        "specialist_id": {
+          "type": "string",
+          "description": "ID of the specialist that produced this file.",
+          "example": "architect-01"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this file's purpose."
+        }
+      }
+    },
+    "SpecialistEntry": {
+      "type": "object",
+      "required": ["id", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique specialist identifier.",
+          "example": "architect-01"
+        },
+        "role": {
+          "type": "string",
+          "description": "Human-readable role name.",
+          "example": "Volumetric Construction"
+        },
+        "output_module": {
+          "type": "string",
+          "description": "Expected Luau output file name.",
+          "example": "StructureGenerator.luau"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "OMC capability tags this specialist exercises."
+        }
+      }
+    }
+  }
+}
